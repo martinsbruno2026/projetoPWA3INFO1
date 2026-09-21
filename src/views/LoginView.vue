@@ -30,35 +30,35 @@
       </div>
 
       <button type="submit" :disabled="loading">
-        {{ loading ? 'Entrando...' : 'Entrar' }}
+        {{ loading ? "Entrando..." : "Entrar" }}
       </button>
     </form>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { useAuthStore } from '@/stores/auth';
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { useAuthStore } from "../stores/auth";
 
 const router = useRouter();
 const authStore = useAuthStore();
 
-const email = ref('');
-const password = ref('');
+const email = ref("");
+const password = ref("");
 const loading = ref(false);
-const errorMessage = ref('');
+const errorMessage = ref("");
 
 async function handleLogin() {
   loading.value = true;
-  errorMessage.value = '';
+  errorMessage.value = "";
   try {
     await authStore.login(email.value, password.value);
-    router.push('/');
+    router.push("/");
   } catch (err) {
     errorMessage.value =
       err.response?.data?.detail ??
-      'Erro ao entrar. Verifique suas credenciais.';
+      "Erro ao entrar. Verifique suas credenciais.";
   } finally {
     loading.value = false;
   }

@@ -13,7 +13,9 @@
 
     <template v-else>
       <section v-if="store.pendingTasks.length > 0">
-        <h2 class="section-title">Pendentes ({{ store.pendingTasks.length }})</h2>
+        <h2 class="section-title">
+          Pendentes ({{ store.pendingTasks.length }})
+        </h2>
         <TaskItem
           v-for="task in store.pendingTasks"
           :key="task.id"
@@ -25,7 +27,9 @@
       </section>
 
       <section v-if="store.completedTasks.length > 0">
-        <h2 class="section-title">Concluídas ({{ store.completedTasks.length }})</h2>
+        <h2 class="section-title">
+          Concluídas ({{ store.completedTasks.length }})
+        </h2>
         <TaskItem
           v-for="task in store.completedTasks"
           :key="task.id"
@@ -41,48 +45,47 @@
       </p>
     </template>
 
-    <InstallButton />
+    <!-- Install button removed because component not found -->
   </div>
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
-import TaskForm from './components/TaskForm.vue'
-import TaskItem from './components/TaskItem.vue'
-import InstallButton from './components/InstallButton.vue'
-import { useTasksStore } from './stores/tasks.js'
+import { onMounted, ref } from "vue";
+import TaskForm from "../components/TaskForm.vue";
+import TaskItem from "../components/TaskItem.vue";
+import { useTasksStore } from "../stores/tasks.js";
 
-const store = useTasksStore()
-const editingTask = ref(null)
+const store = useTasksStore();
+const editingTask = ref(null);
 
 onMounted(() => {
-  store.fetchTasks()
-})
+  store.fetchTasks();
+});
 
 function handleAdd(title) {
-  store.addTask(title)
+  store.addTask(title);
 }
 
 function handleUpdate(id, title, imgAttachmentKey) {
-  store.updateTask(id, { title, imgAttachmentKey })
-  editingTask.value = null
+  store.updateTask(id, { title, imgAttachmentKey });
+  editingTask.value = null;
 }
 
 function handleCancel() {
-  editingTask.value = null
+  editingTask.value = null;
 }
 
 function handleEdit(task) {
-  editingTask.value = task
+  editingTask.value = task;
 }
 
 function handleToggle(id) {
-  store.toggleTask(id)
+  store.toggleTask(id);
 }
 
 function handleRemove(id) {
-  if (editingTask.value?.id === id) editingTask.value = null
-  store.removeTask(id)
+  if (editingTask.value?.id === id) editingTask.value = null;
+  store.removeTask(id);
 }
 </script>
 
