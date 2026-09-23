@@ -35,7 +35,7 @@ function renderLocation() {
   marker = L.marker(point).addTo(map)
   if (props.location.label) marker.bindPopup(props.location.label).openPopup()
 
-  if (props.location.accuracy && props.location.accuracy > 0) {
+  if (props.location.accuracy > 0) {
     accuracyCircle = L.circle(point, {
       radius: props.location.accuracy,
       color: '#4a90d9',
