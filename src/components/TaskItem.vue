@@ -1,112 +1,25 @@
-<template>
-  <div class="task-item" :class="{ done: task.done }">
-    <img
-      v-if="task.img_url"
-      :src="task.img_url"
-      class="task-thumbnail"
-      alt="Imagem da tarefa"
-    />
-    <label class="task-label">
-      <input type="checkbox" :checked="task.done" @change="$emit('toggle', task.id)" />
-      <span class="task-title">{{ task.title }}</span>
-    </label>
-    <div class="task-actions">
-      <button class="task-edit" @click="$emit('edit', task)">Editar</button>
-      <button class="task-remove" @click="$emit('remove', task.id)">Remover</button>
-    </div>
-  </div>
-</template>
-
 <script setup>
-defineProps({
-  task: {
-    type: Object,
-    required: true,
-  },
-})
-
-defineEmits(['toggle', 'remove', 'edit'])
+import { computed } from 'vue'
+const props = defineProps({ task: { type: Object, required: true } })
+const emit = defineEmits(['toggle', 'remove', 'edit'])
+const priorityLabel = computed(() => ({ high: 'Alta', medium: 'Média', low: 'Baixa' }[props.task.priority] || 'Média'))
+const overdue = computed(() => !props.task.done && props.task.dueDate && props.task.dueDate < new Date().toISOString().slice(0,10))
+function formatDate(value) { return value ? new Date(`${value}T00:00:00`).toLocaleDateString('pt-BR') : '' }
+function remove() { if (confirm(`Excluir a tarefa "${props.task.title}"?`)) emit('remove', props.task.id) }
 </script>
-
-<style scoped>
-.task-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px;
-  background-color: white;
-  border-radius: 8px;
-  margin-bottom: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  transition: opacity 0.2s;
-  gap: 10px;
-}
-
-.task-thumbnail {
-  width: 44px;
-  height: 44px;
-  object-fit: cover;
-  border-radius: 6px;
-  border: 1px solid #eee;
-  flex-shrink: 0;
-}
-
-.task-item.done {
-  opacity: 0.6;
-}
-
-.task-label {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  cursor: pointer;
-  flex: 1;
-}
-
-.task-label input[type='checkbox'] {
-  width: 20px;
-  height: 20px;
-  accent-color: #4a90d9;
-}
-
-.task-title {
-  font-size: 1rem;
-}
-
-.task-item.done .task-title {
-  text-decoration: line-through;
-  color: #999;
-}
-
-.task-remove {
-  background: none;
-  border: none;
-  color: #e74c3c;
-  cursor: pointer;
-  font-size: 0.85rem;
-  padding: 4px 8px;
-}
-
-.task-remove:hover {
-  text-decoration: underline;
-}
-
-.task-actions {
-  display: flex;
-  gap: 4px;
-  align-items: center;
-}
-
-.task-edit {
-  background: none;
-  border: none;
-  color: #4a90d9;
-  cursor: pointer;
-  font-size: 0.85rem;
-  padding: 4px 8px;
-}
-
-.task-edit:hover {
-  text-decoration: underline;
-}
-</style>
+<template>
+  <article class="task-card" :class="[{ done: task.done }, `priority-${task.priority}`]">
+    <input class="check" type="checkbox" :checked="task.done" @change="emit('toggle', task.id)" />
+    <div class="task-content">
+      <div class="task-title-row"><h3>{{ task.title }}</h3><span v-if="task.category" class="tag">{{ task.category }}</span></div>
+      <p v-if="task.notes" class="notes">{{ task.notes }}</p>
+      <div class="meta">
+        <span v-if="task.dueDate" :class="{ overdue }">📅 {{ formatDate(task.dueDate) }}{{ overdue ? ' · atrasada' : '' }}</span>
+        <span>⭐ {{ priorityLabel }}</span>
+        <span v-if="task.location">📍 Local salvo</span>
+      </div>
+      <img v-if="task.img_url" :src="task.img_url" class="task-image" alt="Imagem da tarefa" />
+    </div>
+    <div class="task-actions"><button @click="emit('edit', task)" aria-label="Editar">✏️</button><button @click="remove" aria-label="Excluir">🗑️</button></div>
+  </article>
+</template>
