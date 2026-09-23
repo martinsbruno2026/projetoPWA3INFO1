@@ -30,7 +30,19 @@ async function handleImage(event) {
   catch { alert('Não foi possível enviar a imagem.') }
   finally { uploading.value = false }
 }
-function handleCameraCapture(data) { previewUrl.value = data; showCamera.value = false }
+async function handleCameraCapture(file) {
+  showCamera.value = false
+  if (!(file instanceof File)) return
+  previewUrl.value = URL.createObjectURL(file)
+  uploading.value = true
+  try {
+    const { data } = await tasksApi.uploadImage(file)
+    form.img_attachment_key = data.attachment_key || null
+    form.img_url = data.url || data.img_url || previewUrl.value
+  } catch {
+    form.img_url = previewUrl.value
+  } finally { uploading.value = false }
+}
 function submit() { if (!form.title.trim()) return; emit('submit', { ...form, title: form.title.trim() }) }
 function cancel() { emit('cancel') }
 </script>

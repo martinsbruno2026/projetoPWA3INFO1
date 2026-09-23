@@ -24,10 +24,10 @@ function showLocation(task) { selectedLocation.value = task.location }
 
     <div class="toolbar card">
       <div class="search"><span>🔎</span><input v-model="store.search" placeholder="Pesquisar tarefas..." /></div>
-      <div class="filters"><select v-model="store.filter"><option value="all">Todas</option><option value="pending">Pendentes</option><option value="completed">Concluídas</option></select><select v-model="store.priorityFilter"><option value="all">Todas prioridades</option><option value="high">Alta</option><option value="medium">Média</option><option value="low">Baixa</option></select><select v-model="store.categoryFilter"><option value="all">Todas categorias</option><option v-for="category in store.categories" :key="category">{{ category }}</option></select><select v-model="store.sortBy"><option value="created">Mais recentes</option><option value="due">Por prazo</option><option value="priority">Por prioridade</option></select><button class="clear" @click="store.clearFilters">Limpar</button></div>
+      <div class="filters"><select v-model="store.filter"><option value="all">Todas</option><option value="pending">Pendentes</option><option value="completed">Concluídas</option></select><select v-model="store.priorityFilter"><option value="all">Todas prioridades</option><option value="high">Alta</option><option value="medium">Média</option><option value="low">Baixa</option></select><select v-model="store.categoryFilter"><option value="all">Todas categorias</option><option v-for="category in store.categories" :key="category">{{ category }}</option></select><select v-model="store.sortBy"><option value="created">Mais recentes</option><option value="due">Por prazo</option><option value="priority">Por prioridade</option><option value="title">Por nome</option></select><button class="clear" @click="store.clearFilters">Limpar</button></div>
     </div>
 
-    <div v-if="store.error" class="alert">⚠️ {{ store.error }}</div>
+    <div v-if="store.error" class="alert">⚠️ {{ store.error }}</div><div v-if="store.usingLocal" class="local-badge">💾 Modo local ativo — as tarefas continuam funcionando sem a API.</div>
     <div v-if="store.loading" class="loading">Carregando tarefas...</div>
     <template v-else>
       <div class="list-header"><h2>{{ store.filteredTasks.length ? 'Minhas tarefas' : 'Nenhuma tarefa encontrada' }}</h2><span v-if="store.overdueCount" class="overdue-badge">{{ store.overdueCount }} atrasada(s)</span></div>
