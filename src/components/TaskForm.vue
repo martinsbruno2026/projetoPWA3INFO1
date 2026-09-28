@@ -8,7 +8,7 @@
         class="task-input"
       />
       <button type="submit" class="task-button" :disabled="uploading">
-        {{ editingTask ? 'Alterar' : 'Adicionar' }}
+        {{ editingTask ? "Alterar" : "Adicionar" }}
       </button>
       <button
         v-if="editingTask"
@@ -20,59 +20,60 @@
       </button>
     </div>
 
-   <div class="image-section">
-  <img
-    v-if="previewUrl || editingTask?.img_url"
-    :src="previewUrl || editingTask?.img_url"
-    class="image-preview"
-    alt="Imagem da tarefa"
-  />
-  <label class="image-label" :class="{ disabled: uploading }">
-    <span v-if="uploading" class="upload-status">Enviando...</span>
-    <span v-else>
-      {{ previewUrl || editingTask?.img_url
-        ? 'Trocar imagem'
-        : 'Adicionar imagem'
-      }}
-    </span>
-    <input
-      type="file"
-      accept="image/jpeg,image/png"
-      capture="environment"
-      class="image-input"
-      :disabled="uploading"
-      @change="handleImageChange"
-    />
-  </label>
-  <p class="image-help">
-    Em celular, o botão pode abrir a câmera.
-    Em notebook, abre o seletor de arquivos.
-  </p>
-</div>
+    <div class="image-section">
+      <img
+        v-if="previewUrl || editingTask?.img_url"
+        :src="previewUrl || editingTask?.img_url"
+        class="image-preview"
+        alt="Imagem da tarefa"
+      />
+      <label class="image-label" :class="{ disabled: uploading }">
+        <span v-if="uploading" class="upload-status">Enviando...</span>
+        <span v-else>
+          {{
+            previewUrl || editingTask?.img_url
+              ? "Trocar imagem"
+              : "Adicionar imagem"
+          }}
+        </span>
+        <input
+          type="file"
+          accept="image/jpeg,image/png"
+          capture="environment"
+          class="image-input"
+          :disabled="uploading"
+          @change="handleImageChange"
+        />
+      </label>
+      <p class="image-help">
+        Em celular, o botão pode abrir a câmera. Em notebook, abre o seletor de
+        arquivos.
+      </p>
+    </div>
   </form>
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
-import tasksApi from '../api/tasksApi.js'
+import { ref, watch } from "vue";
+import tasksApi from "../api/tasksApi.js";
 
 const props = defineProps({
   editingTask: {
     type: Object,
     default: null,
   },
-})
+});
 
-const emit = defineEmits(['add', 'update', 'cancel'])
-const newTask = ref('')
-const previewUrl = ref(null)
-const imgAttachmentKey = ref(null)
-const uploading = ref(false)
+const emit = defineEmits(["add", "update", "cancel"]);
+const newTask = ref("");
+const previewUrl = ref(null);
+const imgAttachmentKey = ref(null);
+const uploading = ref(false);
 
 watch(
   () => props.editingTask,
   (task) => {
-    newTask.value = task ? task.title : '';
+    newTask.value = task ? task.title : "";
     if (previewUrl.value) URL.revokeObjectURL(previewUrl.value);
     previewUrl.value = null;
     imgAttachmentKey.value = null;
@@ -80,54 +81,48 @@ watch(
 );
 
 async function handleImageChange(event) {
-  const file = event.target.files[0]
-  if (!file) return 
-  if (previewUrl.value) URL.revokeObjectURL(previewUrl.value)
-  previewUrl.value = URL.createObjectURL(file)
- 
-  
-  
-  uploading.value = true
+  const file = event.target.files[0];
+  if (!file) return;
+  if (previewUrl.value) URL.revokeObjectURL(previewUrl.value);
+  previewUrl.value = URL.createObjectURL(file);
+
+  uploading.value = true;
   try {
-    const response = await tasksApi.uploadImage(file)
-    imgAttachmentKey.value = response.data.attachment_key
+    const response = await tasksApi.uploadImage(file);
+    imgAttachmentKey.value = response.data.attachment_key;
   } catch (err) {
-    console.error('Erro ao fazer upload da imagem', err)
-    previewUrl.value = null
-    imgAttachmentKey.value = null
+    console.error("Erro ao fazer upload da imagem", err);
+    previewUrl.value = null;
+    imgAttachmentKey.value = null;
   } finally {
-    uploading.value = false
+    uploading.value = false;
   }
 }
 
 function handleSubmit() {
-  if (!newTask.value.trim()) return
+  const payload = {
+    title: newTask.value.trim(),
+  };
   if (props.editingTask) {
-    emit(
-      'update',
-      props.editingTask.id,
-      newTask.value.trim(),
-      imgAttachmentKey.value
-    )
-      if (props.editingTask) {
-    emit('update', props.editingTask.id, payload);
+    emit("update", {
+      id: props.editingTask.id,
+      title: newTask.value.trim(),
+      imgAttachmentKey: imgAttachmentKey.value || null,
+    });
   } else {
-    emit('add', payload);
+    emit("add", payload);
   }
-  } else {
-    emit( 'add', newTask.value.trim() )
-  }
-  newTask.value = ''
-  previewUrl.value = null
-  imgAttachmentKey.value = null
+  newTask.value = "";
+  previewUrl.value = null;
+  imgAttachmentKey.value = null;
 }
 
 function handleCancel() {
-  newTask.value = '';
+  newTask.value = "";
   if (previewUrl.value) URL.revokeObjectURL(previewUrl.value);
   previewUrl.value = null;
   imgAttachmentKey.value = null;
-  emit('cancel');
+  emit("cancel");
 }
 </script>
 
@@ -241,4 +236,3 @@ function handleCancel() {
   color: #888;
 }
 </style>
-
