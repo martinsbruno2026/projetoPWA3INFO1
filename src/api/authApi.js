@@ -1,7 +1,7 @@
-import apiClient from './config';
+import apiClient from "./config";
 
 export default {
   login(email, password) {
-    return apiClient.post('/api/token', { email, password });
+    return apiClient.post("/api/token", { email, password });
   },
 };
