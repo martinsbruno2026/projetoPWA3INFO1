@@ -16,15 +16,14 @@ const tasksApi = {
   remove(id) {
     return apiClient.delete(`/tasks/${id}`);
   },
+
   uploadImage(file, description = "") {
     const formData = new FormData();
     formData.append("file", file);
     if (description) formData.append("description", description);
-<<<<<<< HEAD
-    return apiClient.post("/uploads/images/", formData, { headers: {} });
-=======
-    return apiClient.post("/uploads/images/", formData);
->>>>>>> 5c73340 (update 14/10)
+    return apiClient.post("/uploads/images/", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
   },
 };
 export default tasksApi;

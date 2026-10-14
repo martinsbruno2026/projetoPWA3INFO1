@@ -83,9 +83,7 @@ watch(
 async function handleImageChange(event) {
   const file = event.target.files[0];
   if (!file) return;
-  if (previewUrl.value) URL.revokeObjectURL(previewUrl.value);
   previewUrl.value = URL.createObjectURL(file);
-
   uploading.value = true;
   try {
     const response = await tasksApi.uploadImage(file);

@@ -176,25 +176,41 @@ export const useTasksStore = defineStore("tasks", () => {
     }
   }
 
-  async function updateTask(id, changes) {
-    const current = tasks.value.find((t) => String(t.id) === String(id));
-    if (!current) return;
-    saving.value = true;
+  // async function updateTask(id, changes) {
+  //   const current = tasks.value.find((t) => String(t.id) === String(id));
+  //   if (!current) return;
+  //   saving.value = true;
+  //   error.value = null;
+  //   const updated = normalize({ ...current, ...changes });
+  //   try {
+  //     const response = await tasksApi.update(id, changes);
+  //     Object.assign(updated, response.data || {});
+  //     usingLocal.value = false;
+  //   } catch {
+  //     usingLocal.value = true;
+  //   }
+  //   const index = tasks.value.findIndex((t) => String(t.id) === String(id));
+  //   if (index !== -1) tasks.value[index] = updated;
+  //   saveMeta(updated);
+  //   saveLocal();
+  //   saving.value = false;
+  //   return updated;
+  // }
+
+  async function updateTask(id, { title, imgAttachmentKey } = {}) {
+    if (title !== undefined && !title.trim()) return;
     error.value = null;
-    const updated = normalize({ ...current, ...changes });
+    const payload = {};
+    if (title !== undefined) payload.title = title.trim();
+    if (imgAttachmentKey != null) payload.img_attachment_key = imgAttachmentKey;
     try {
-      const response = await tasksApi.update(id, changes);
-      Object.assign(updated, response.data || {});
-      usingLocal.value = false;
-    } catch {
-      usingLocal.value = true;
+      const response = await tasksApi.update(id, payload);
+      const index = tasks.value.findIndex((t) => t.id === id);
+      if (index !== -1) tasks.value[index] = response.data;
+    } catch (err) {
+      error.value = "Erro ao editar tarefa.";
+      console.error(err);
     }
-    const index = tasks.value.findIndex((t) => String(t.id) === String(id));
-    if (index !== -1) tasks.value[index] = updated;
-    saveMeta(updated);
-    saveLocal();
-    saving.value = false;
-    return updated;
   }
 
   async function toggleTask(id) {
